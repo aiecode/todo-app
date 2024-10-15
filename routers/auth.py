@@ -19,8 +19,8 @@ router = APIRouter(
 SECRET_KEY = '67d898b298e884d8075015ec7a8c8ddc8a2dd753fe9285e3b983c708ee839898'
 ALGORITHM = 'HS256'
 
-bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auth/auto')
-oauth2_bearer = OAuth2PasswordBearer(tokenUrl='token')
+bcrypt_context = CryptContext(schemes=['bcrypt'], deprecated='auto')
+oauth2_bearer = OAuth2PasswordBearer(tokenUrl='auth/token')
 
 
 class CreateUserRequest(BaseModel):
@@ -51,9 +51,12 @@ db_dependency = Annotated[Session, Depends(get_db)]
 def authenticate_user(username: str, password: str, db):
     user = db.query(Users).filter(Users.username == username).first()
     if not user:
+        print("User not found")  # Debugging info
         return False
     if not bcrypt_context.verify(password, user.hashed_password):
+        print("Password mismatch")  # Debugging info
         return False
+    print('Auth successful') # Debugging info
     return user
 
 
